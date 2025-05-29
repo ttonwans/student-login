@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>เข้าสู่ระบบนักเรียน</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+  <h2>เข้าสู่ระบบนักเรียน</h2>
+
+  <form id="loginForm">
+    <label>รหัสนักเรียน (5 หลัก):</label><br />
+    <input type="text" id="student_id" maxlength="5" required><br><br>
+
+    <label>เลขบัตรประชาชน (13 หลัก):</label><br />
+    <input type="text" id="id_card" maxlength="13" required><br><br>
+
+    <button type="submit">เข้าสู่ระบบ</button>
+  </form>
+
+  <script>
+    const liffId = "2007500174-V59AaO1y"; // 👈 เปลี่ยนเป็น LIFF ID ของคุณ
+
+    async function main() {
+      await liff.init({ liffId });
+
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+      }
+
+      const userId = (await liff.getProfile()).userId;
+
+      document.getElementById("loginForm").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const studentId = document.getElementById("student_id").value;
+        const idCard = document.getElementById("id_card").value;
+
+        const res = await fetch("https://your-api.com/login", { // 👈 เปลี่ยนเป็น URL จริงในขั้นตอนหน้า
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId, studentId, idCard })
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          alert("เข้าสู่ระบบสำเร็จ");
+          liff.closeWindow();
+        } else {
+          alert("เข้าสู่ระบบล้มเหลว: " + data.message);
+        }
+      });
+    }
+
+    main();
+  </script>
+</body>
+</html>
